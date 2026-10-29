@@ -53,12 +53,19 @@ The WXR import has no comment support. `migration/wxr-comments-to-sql.py`
 loads all 18 approved comments (7 regular, 11 Twitter mentions) with their
 WordPress ids and threading.
 
+## Shortcodes
+
+The WXR keeps shortcodes as literal text (WordPress expands them at render
+time). `migration/fix-shortcodes.py` turns `[caption]` into image captions,
+`[embed]` into iframe blocks (or drops it when the video is already there),
+and repairs the mojibake below. Applied 2026-10-29 (7 posts).
+
 ## Encoding
 
 `/snl-irresponsibly-promotes-trees/` and `/call-em-as-you-see-em/` contain
 double-encoded text ("weâ€™re") that is already wrong on the live WordPress
-site. The import carries it over as-is; fix by hand if wanted (`â€™` → `’`,
-`â€œ`/`â€` → `“`/`”`).
+site. Repaired by `migration/fix-shortcodes.py` (it also caught `Â` before
+non-breaking spaces in three more posts).
 
 ## Search the imported content for leftovers
 
