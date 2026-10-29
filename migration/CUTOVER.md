@@ -47,6 +47,8 @@ archive. Nothing below depends on it.
    npx wrangler d1 execute treehater-emdash-db-v2 --remote --file /tmp/split.sql
    python3 -I migration/restore-embeds.py --remote > /tmp/embeds.sql
    npx wrangler d1 execute treehater-emdash-db-v2 --remote --file /tmp/embeds.sql
+   python3 -I migration/fix-shortcodes.py --remote > /tmp/shortcodes.sql
+   npx wrangler d1 execute treehater-emdash-db-v2 --remote --file /tmp/shortcodes.sql
    ```
    then the rest of `migration/post-import-fixes.md`.
 7. **Verify**: every URL in `redirect-check.txt` against www returns 200/301,
