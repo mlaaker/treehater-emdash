@@ -13,3 +13,6 @@ data.db-*
 !.env.example
 .dev.vars
 .dev.vars.*
+
+# Generated from the WXR export; contains commenter emails
+migration/comments.sql

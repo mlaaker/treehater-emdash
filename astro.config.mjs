@@ -24,12 +24,9 @@ export default defineConfig({
 			sandboxRunner: sandbox(),
 			marketplace: "https://marketplace.emdashcms.com",
 			// Passkeys are bound to the rpId, and login redirects and CSRF checks use
-			// the same origin, all from siteUrl. The admin lives on the apex (which
-			// otherwise only 301s to www, as on WordPress), so it works before
-			// cutover and its rpId "treehater.com" is also accepted on www after.
-			// Public URLs stay on www (the site setting "url" and `site` above).
-			siteUrl: "https://treehater.com",
-			allowedOrigins: ["https://www.treehater.com"],
+			// the same origin, all from siteUrl. The admin is claimed on www after
+			// cutover (never on workers.dev), so www is the one origin.
+			siteUrl: "https://www.treehater.com",
 		}),
 	],
 	// Fonts are Twenty Twenty's own self-hosted Inter, in public/twentytwenty/.

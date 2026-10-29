@@ -1,8 +1,8 @@
 # Post-import fixes
 
-Things the WordPress import is known to drop or mangle on this site, found by
-importing a REST-built WXR into a local dev database on 2026-10-29. Check each
-one after the real exporter import (Phase 4) and fix in the EmDash admin.
+Things the WordPress import drops or mangles on this site, found by importing
+the real WXR export into a local dev database on 2026-10-29. Check each one
+after the import (CUTOVER.md step 6).
 
 ## Embeds (raw `<iframe>`/`<embed>` HTML is dropped by the HTML → Portable Text conversion)
 
@@ -24,6 +24,19 @@ Re-add each as an Embed/Iframe block at the same spot in the post.
   instead, so the imported body is never shown. Leave it.
 - **/about/** (titled "Home") — body is a JavaScript redirect to `/`, which
   is stripped on import. `src/pages/about.ts` 301s to `/` instead.
+
+## Images
+
+`migration/rewrite-upload-urls.sql` points every upload URL (http/https,
+www/apex, and one typo'd `wwwr.` host on /let-them-feast-on-their-own-flesh/)
+at the Worker's copy in `public/wp-content/uploads/`. Images hotlinked from
+other sites (gawker.com, assoc-amazon.com tracking pixels) are left as-is.
+
+## Comments
+
+The WXR import has no comment support. `migration/wxr-comments-to-sql.py`
+loads all 18 approved comments (7 regular, 11 Twitter mentions) with their
+WordPress ids and threading.
 
 ## Encoding
 
