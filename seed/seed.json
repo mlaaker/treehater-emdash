@@ -8,14 +8,21 @@
 	},
 	"settings": {
 		"title": "Anti-Arboreal Association",
-		"tagline": "Countering the lies and evil of the sentient, rooted beasts all around us."
+		"tagline": "Countering the lies and evil of the sentient, rooted beasts all around us.",
+		"url": "https://www.treehater.com",
+		"postsPerPage": 10,
+		"timezone": "America/Los_Angeles",
+		"dateFormat": "F j, Y",
+		"social": {
+			"twitter": "notrees"
+		}
 	},
 	"collections": [
 		{
 			"slug": "posts",
 			"label": "Posts",
 			"labelSingular": "Post",
-			"urlPattern": "/posts/{slug}",
+			"urlPattern": "/{slug}/",
 			"supports": [
 				"drafts",
 				"revisions",
@@ -55,7 +62,7 @@
 			"slug": "pages",
 			"label": "Pages",
 			"labelSingular": "Page",
-			"urlPattern": "/pages/{slug}",
+			"urlPattern": "/{slug}/",
 			"supports": [
 				"drafts",
 				"revisions",
@@ -76,6 +83,11 @@
 					"label": "Content",
 					"type": "portableText",
 					"searchable": true
+				},
+				{
+					"slug": "excerpt",
+					"label": "Excerpt",
+					"type": "text"
 				}
 			]
 		}
@@ -121,7 +133,7 @@
 				{
 					"type": "custom",
 					"label": "Home",
-					"url": "/about/"
+					"url": "/"
 				},
 				{
 					"type": "custom",

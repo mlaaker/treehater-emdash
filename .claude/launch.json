@@ -1,0 +1,13 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "emdash-dev",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": [
+				"dev"
+			],
+			"port": 4321
+		}
+	]
+}

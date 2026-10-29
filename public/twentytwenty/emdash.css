@@ -1,0 +1,81 @@
+/*
+ * Small additions so EmDash-rendered pieces sit in Twenty Twenty's look:
+ * the comment form, embeds, and the rebuilt store grid.
+ */
+
+/* Comment form (emdash/ui/comments CommentForm), styled like WordPress's #commentform */
+.tt-comment-form .ec-comment-form-fields,
+.tt-comment-form .ec-comment-form-field {
+	display: block;
+	margin-bottom: 2rem;
+}
+.tt-comment-form label {
+	display: block;
+	font-size: 1.6rem;
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+}
+.tt-comment-form input,
+.tt-comment-form textarea {
+	width: 100%;
+	max-width: none;
+}
+.tt-comment-form .ec-comment-form-status {
+	margin-top: 1.5rem;
+	font-size: 1.6rem;
+	color: #6d6d6d;
+}
+
+/* Embeds from Portable Text keep the 16:9 shape WordPress's responsive embeds had */
+.entry-content iframe {
+	display: block;
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+/* /store/ product grid (replaces the dead [amazon_link] ProductGrid shortcode) */
+.aaa-store-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+	gap: 2rem;
+	list-style: none;
+	margin-bottom: 3rem;
+	padding: 0;
+}
+.entry-content .aaa-store-grid li {
+	margin: 0;
+}
+.aaa-store-grid a {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 1.5rem;
+	height: 100%;
+	padding: 2rem;
+	border: 0.1rem solid #dcd7ca;
+	text-decoration: none;
+	color: #000;
+}
+.aaa-store-grid a:hover,
+.aaa-store-grid a:focus {
+	border-color: #e22658;
+}
+.aaa-store-name {
+	font-family: "Inter var", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 1.8rem;
+	font-weight: 600;
+	line-height: 1.3;
+}
+.aaa-store-cta {
+	font-family: "Inter var", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 1.5rem;
+	font-weight: 700;
+	letter-spacing: 0.036666667em;
+	text-transform: uppercase;
+	color: #e22658;
+}
+.aaa-store-disclosure {
+	font-size: 1.6rem;
+	color: #6d6d6d;
+}
+.tt-comment-form textarea { font-weight: 400; }

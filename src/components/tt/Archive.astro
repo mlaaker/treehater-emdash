@@ -1,0 +1,91 @@
+---
+/**
+ * A Twenty Twenty post archive: optional archive header, full posts with
+ * separators, and WordPress-style numbered pagination (/page/2/).
+ */
+import PostArticle from "./PostArticle.astro";
+import { loadPostExtras, type PostEntry } from "../../lib/tt";
+
+interface Props {
+	posts: PostEntry[];
+	page: number;
+	totalPages: number;
+	/** Path of page 1, with a trailing slash, e.g. "/" or "/tag/tv/". */
+	basePath: string;
+	/** e.g. "Category:" */
+	headingLabel?: string;
+	heading?: string;
+	subtitle?: string;
+	/** Appended to page links, e.g. "?s=tree". */
+	query?: string;
+}
+
+const { posts, page, totalPages, basePath, headingLabel, heading, subtitle, query = "" } = Astro.props;
+const extras = await loadPostExtras(posts);
+
+const pageHref = (n: number) => (n === 1 ? basePath : `${basePath}page/${n}/`) + query;
+---
+
+{
+	heading && (
+		<header class="archive-header has-text-align-center header-footer-group">
+			<div class="archive-header-inner section-inner medium">
+				<h1 class="archive-title">
+					{headingLabel && <span class="color-accent">{headingLabel}</span>} <span set:html={heading} />
+				</h1>
+				{subtitle && (
+					<div class="archive-subtitle section-inner thin max-percentage intro-text">
+						<p>{subtitle}</p>
+					</div>
+				)}
+			</div>
+		</header>
+	)
+}
+
+{
+	posts.map((post, i) => (
+		<>
+			{i > 0 && <hr class="post-separator styled-separator is-style-wide section-inner" aria-hidden="true" />}
+			<PostArticle post={post} extras={extras.get(post.data.id)!} />
+		</>
+	))
+}
+
+{
+	totalPages > 1 && (
+		<div class="pagination-wrapper section-inner">
+			<hr class="styled-separator pagination-separator is-style-wide" aria-hidden="true" />
+			<nav class="navigation pagination" aria-label="Posts pagination">
+				<h2 class="screen-reader-text">Posts pagination</h2>
+				<div class="nav-links">
+					{page > 1 ? (
+						<a class="prev page-numbers" href={pageHref(page - 1)}>
+							<span aria-hidden="true">&larr;</span> <span class="nav-prev-text">Newer <span class="nav-short">Posts</span></span>
+						</a>
+					) : (
+						<span class="prev page-numbers placeholder" aria-hidden="true">
+							<span aria-hidden="true">&larr;</span> <span class="nav-prev-text">Newer <span class="nav-short">Posts</span></span>
+						</span>
+					)}
+					{Array.from({ length: totalPages }, (_, i) => i + 1).map((n) =>
+						n === page ? (
+							<span aria-current="page" class="page-numbers current">{n}</span>
+						) : (
+							<a class="page-numbers" href={pageHref(n)}>{n}</a>
+						),
+					)}
+					{page < totalPages ? (
+						<a class="next page-numbers" href={pageHref(page + 1)}>
+							<span class="nav-next-text">Older <span class="nav-short">Posts</span></span> <span aria-hidden="true">&rarr;</span>
+						</a>
+					) : (
+						<span class="next page-numbers placeholder" aria-hidden="true">
+							<span class="nav-next-text">Older <span class="nav-short">Posts</span></span> <span aria-hidden="true">&rarr;</span>
+						</span>
+					)}
+				</div>
+			</nav>
+		</div>
+	)
+}

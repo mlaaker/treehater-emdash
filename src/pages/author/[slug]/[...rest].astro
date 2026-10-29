@@ -1,0 +1,32 @@
+---
+/** Author archive at WordPress's /author/:nicename/ URL, matched to the imported byline's slug. */
+import { decodeSlug, getEmDashCollection } from "emdash";
+import Base from "../../../layouts/Base.astro";
+import Archive from "../../../components/tt/Archive.astro";
+import { escapeHtml, parsePageParam, POSTS_PER_PAGE } from "../../../lib/tt";
+
+const slug = decodeSlug(Astro.params.slug);
+const page = parsePageParam(Astro.params.rest);
+if (!slug || !page) return Astro.rewrite("/404");
+
+const { entries, cacheHint } = await getEmDashCollection("posts", {
+	orderBy: { published_at: "desc" },
+	limit: 1000,
+});
+const posts = entries.filter((p) => p.data.bylines?.some((credit) => credit.byline.slug === slug));
+const byline = posts[0]?.data.bylines?.find((credit) => credit.byline.slug === slug)?.byline;
+const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
+if (!byline || page > totalPages) return Astro.rewrite("/404");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+---
+
+<Base title={byline.displayName} bodyClass={`archive author author-${slug}`}>
+	<Archive
+		posts={posts.slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE)}
+		page={page}
+		totalPages={totalPages}
+		basePath={`/author/${slug}/`}
+		headingLabel="Author:"
+		heading={escapeHtml(byline.displayName)}
+	/>
+</Base>

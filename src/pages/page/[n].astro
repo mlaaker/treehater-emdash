@@ -1,0 +1,22 @@
+---
+/** Home page pagination, at WordPress's /page/2/ URLs. */
+import { getSiteSettings } from "emdash";
+import Base from "../../layouts/Base.astro";
+import Archive from "../../components/tt/Archive.astro";
+import { loadPostPage, parsePageParam } from "../../lib/tt";
+import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+
+const page = parsePageParam(`page/${Astro.params.n}`);
+if (!page) return Astro.rewrite("/404");
+if (page === 1) return Astro.redirect("/", 301);
+
+const result = await loadPostPage(page);
+if (page > result.totalPages) return Astro.rewrite("/404");
+if (Astro.cache?.enabled) Astro.cache.set(result.cacheHint);
+
+const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+---
+
+<Base title={`${siteTitle} – Page ${page}`} bodyClass="home blog paged">
+	<Archive posts={result.posts} page={page} totalPages={result.totalPages} basePath="/" />
+</Base>
