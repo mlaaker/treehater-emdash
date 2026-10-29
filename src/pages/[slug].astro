@@ -1,0 +1,187 @@
+---
+/**
+ * Posts and pages at WordPress's /%postname%/ permalinks. Pages win a slug
+ * clash, as they did in WordPress.
+ */
+import {
+	decodeSlug,
+	getComments,
+	getCollectionInfo,
+	getEmDashCollection,
+	getEmDashEntry,
+	getSeoMeta,
+	getSiteSettings,
+} from "emdash";
+import { PortableText } from "emdash/ui";
+import { CommentForm } from "emdash/ui/comments";
+import Base from "../layouts/Base.astro";
+import PostArticle from "../components/tt/PostArticle.astro";
+import { loadPostExtras, permalink, repliesHeading, wpDate } from "../lib/tt";
+import { resolveBlogSiteIdentity } from "../utils/site-identity";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.rewrite("/404");
+
+const [pageResult, postResult, settings] = await Promise.all([
+	getEmDashEntry("pages", slug),
+	getEmDashEntry("posts", slug),
+	getSiteSettings(),
+]);
+const page = pageResult.entry;
+const post = page ? null : postResult.entry;
+if (!page && !post) return Astro.rewrite("/404");
+if (Astro.cache?.enabled) Astro.cache.set((page ? pageResult : postResult).cacheHint);
+
+const { siteTitle } = resolveBlogSiteIdentity(settings);
+const entry = (page ?? post)!;
+const seo = getSeoMeta(entry, {
+	siteTitle,
+	siteUrl: Astro.site?.origin ?? Astro.url.origin,
+	path: permalink(slug),
+});
+
+// Single-post extras: categories/tags/count, prev/next, and the comment thread.
+let extras;
+let older;
+let newer;
+let comments: Awaited<ReturnType<typeof getComments>> = { items: [], total: 0 };
+if (post) {
+	const [extrasById, all, thread] = await Promise.all([
+		loadPostExtras([post]),
+		getEmDashCollection("posts", { orderBy: { published_at: "desc" }, limit: 1000 }),
+		getComments({ collection: "posts", contentId: post.data.id, threaded: true }),
+	]);
+	extras = extrasById.get(post.data.id)!;
+	const i = all.entries.findIndex((p) => p.data.id === post.data.id);
+	older = i >= 0 ? all.entries[i + 1] : undefined;
+	newer = i > 0 ? all.entries[i - 1] : undefined;
+	comments = thread;
+}
+
+// Same rule EmDash's comment endpoint applies, so the form only shows when a
+// submission would be accepted (Twenty Twenty prints "Comments are closed." otherwise).
+const postsInfo = post ? await getCollectionInfo("posts") : null;
+const closeAfterDays = postsInfo?.commentsClosedAfterDays ?? 0;
+const publishedMs = post?.data.publishedAt?.getTime();
+const commentsOpen =
+	!!postsInfo?.commentsEnabled &&
+	!(closeAfterDays > 0 && publishedMs && Date.now() > publishedMs + closeAfterDays * 86_400_000);
+
+type Comment = (typeof comments.items)[number];
+const paragraphs = (body: string) => body.split(/\n{2,}/).filter((p) => p.trim());
+const commentTime = (iso: string) => {
+	const d = new Date(iso);
+	const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/Los_Angeles" }).toLowerCase();
+	return `${wpDate(d)} at ${time}`;
+};
+---
+
+<Base
+	title={entry.data.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description}
+	image={seo.ogImage}
+	canonical={seo.canonical}
+	robots={seo.robots}
+	type={post ? "article" : "website"}
+	publishedTime={entry.data.publishedAt?.toISOString() ?? null}
+	modifiedTime={entry.data.updatedAt.toISOString()}
+	content={{ collection: post ? "posts" : "pages", id: entry.data.id, slug }}
+	bodyClass={post
+		? "wp-singular post-template-default single single-post singular has-single-pagination"
+		: "wp-singular page-template-default page singular missing-post-thumbnail has-no-pagination"}
+>
+	{
+		post && extras ? (
+			<PostArticle post={post} extras={extras} single>
+				{(older || newer) && (
+					<nav class="pagination-single section-inner" aria-label="Post">
+						<hr class="styled-separator is-style-wide" aria-hidden="true" />
+						<div class="pagination-single-inner">
+							{older && (
+								<a class="previous-post" href={permalink(older.id)}>
+									<span class="arrow" aria-hidden="true">&larr;</span>
+									<span class="title"><span class="title-inner">{older.data.title}</span></span>
+								</a>
+							)}
+							{newer && (
+								<a class="next-post" href={permalink(newer.id)}>
+									<span class="arrow" aria-hidden="true">&rarr;</span>
+									<span class="title"><span class="title-inner">{newer.data.title}</span></span>
+								</a>
+							)}
+						</div>
+						<hr class="styled-separator is-style-wide" aria-hidden="true" />
+					</nav>
+				)}
+
+				<div class="comments-wrapper section-inner">
+					{comments.total > 0 && (
+						<div class="comments" id="comments">
+							<div class="comments-header section-inner small max-percentage">
+								<h2 class="comment-reply-title">{repliesHeading(comments.total, post.data.title)}</h2>
+							</div>
+							<div class="comments-inner section-inner thin max-percentage">
+								{comments.items.map(function renderComment(c: Comment, depth = 1): any {
+									return (
+										<div id={`comment-${c.id}`} class={`comment depth-${depth}`}>
+											<article class="comment-body">
+												<footer class="comment-meta">
+													<div class="comment-author vcard">
+														<span class="fn">{c.authorName}</span>
+														<span class="screen-reader-text says">says:</span>
+													</div>
+													<div class="comment-metadata">
+														<a href={`${permalink(post.id)}#comment-${c.id}`}>
+															<time datetime={c.createdAt}>{commentTime(c.createdAt)}</time>
+														</a>
+													</div>
+												</footer>
+												<div class="comment-content entry-content">
+													{paragraphs(c.body).map((p) => <p>{p}</p>)}
+												</div>
+											</article>
+											{c.replies?.length ? (
+												<div class="children">{c.replies.map((r) => renderComment(r, depth + 1))}</div>
+											) : null}
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					)}
+					{commentsOpen ? (
+						<>
+							{comments.total > 0 && <hr class="styled-separator is-style-wide" aria-hidden="true" />}
+							<div id="respond" class="comment-respond">
+								<h2 id="reply-title" class="comment-reply-title">Leave a Reply</h2>
+								<div class="section-inner thin max-percentage">
+									<CommentForm collection="posts" contentId={post.data.id} class="tt-comment-form" />
+								</div>
+							</div>
+						</>
+					) : (
+						comments.total > 0 && (
+							<div class="comment-respond" id="respond">
+								<p class="comments-closed">Comments are closed.</p>
+							</div>
+						)
+					)}
+				</div>
+			</PostArticle>
+		) : (
+			<article class="page type-page status-publish hentry" id={`post-${entry.data.id}`}>
+				<header class="entry-header has-text-align-center header-footer-group">
+					<div class="entry-header-inner section-inner medium">
+						<h1 class="entry-title" {...entry.edit.title}>{entry.data.title}</h1>
+					</div>
+				</header>
+				<div class="post-inner thin">
+					<div class="entry-content" {...entry.edit.content}>
+						<PortableText value={entry.data.content ?? []} />
+					</div>
+				</div>
+			</article>
+		)
+	}
+</Base>

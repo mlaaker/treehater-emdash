@@ -1,0 +1,23 @@
+---
+/** Tag archive at WordPress's /tag/:slug/ URL, with /page/N/. */
+import { decodeSlug } from "emdash";
+import Base from "../../../layouts/Base.astro";
+import Archive from "../../../components/tt/Archive.astro";
+import { escapeHtml, loadTermArchive } from "../../../lib/tt";
+
+const archive = await loadTermArchive("tag", decodeSlug(Astro.params.slug), Astro.params.rest);
+if (!archive) return Astro.rewrite("/404");
+if (Astro.cache?.enabled) archive.cacheHints.forEach((hint) => Astro.cache.set(hint));
+const { term } = archive;
+---
+
+<Base title={term.label} bodyClass={`archive tag tag-${term.slug}`}>
+	<Archive
+		posts={archive.posts}
+		page={archive.page}
+		totalPages={archive.totalPages}
+		basePath={`/tag/${term.slug}/`}
+		headingLabel="Tag:"
+		heading={escapeHtml(term.label)}
+	/>
+</Base>

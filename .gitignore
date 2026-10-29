@@ -1,6 +1,18 @@
 node_modules
 dist
 .astro
+.emdash/migrations.json
 uploads
 data.db
+data.db-*
 .wrangler
+
+# Environment / Wrangler secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# Generated from the WXR export; contains commenter emails
+migration/comments.sql

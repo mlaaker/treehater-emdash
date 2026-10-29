@@ -1,33 +1,20 @@
 ---
+/** Twenty Twenty's 404 page. */
 import Base from "../layouts/Base.astro";
 ---
 
-<Base title="Page not found">
-	<div class="not-found">
-		<h1>404</h1>
-		<p>The page you're looking for doesn't exist.</p>
-		<a href="/">Go back home</a>
+<Base title="Page not found" bodyClass="error404 missing-post-thumbnail has-no-pagination" robots="noindex">
+	<div class="section-inner thin error404-content">
+		<h1 class="entry-title">Page Not Found</h1>
+		<div class="intro-text">
+			<p>The page you were looking for could not be found. It might have been removed, renamed, or did not exist in the first place.</p>
+		</div>
+		<form role="search" aria-label="404 not found" method="get" class="search-form" action="/">
+			<label for="search-form-2">
+				<span class="screen-reader-text">Search for:</span>
+				<input type="search" id="search-form-2" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+			</label>
+			<input type="submit" class="search-submit" value="Search" />
+		</form>
 	</div>
 </Base>
-
-<style>
-	.not-found {
-		text-align: center;
-		padding: var(--spacing-24) var(--spacing-6);
-	}
-
-	.not-found h1 {
-		font-size: var(--font-size-5xl);
-		margin-bottom: var(--spacing-2);
-		color: var(--color-border);
-	}
-
-	.not-found p {
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-6);
-	}
-
-	.not-found a {
-		color: var(--color-text);
-	}
-</style>

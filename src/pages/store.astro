@@ -1,0 +1,40 @@
+---
+/**
+ * /store/, rebuilt as a product grid (Decision 5). The imported "store" page
+ * still supplies the title; its body is the dead shortcode, so it's not shown.
+ */
+import { getEmDashEntry } from "emdash";
+import Base from "../layouts/Base.astro";
+import { productUrl, products } from "../data/store";
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", "store");
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+const title = page?.data.title ?? "Store";
+---
+
+<Base title={title} bodyClass="wp-singular page-template-default page singular missing-post-thumbnail has-no-pagination">
+	<article class="page type-page status-publish hentry">
+		<header class="entry-header has-text-align-center header-footer-group">
+			<div class="entry-header-inner section-inner medium">
+				<h1 class="entry-title">{title}</h1>
+			</div>
+		</header>
+		<div class="post-inner thin">
+			<div class="entry-content">
+				<ul class="aaa-store-grid">
+					{
+						products.map((p) => (
+							<li>
+								<a href={productUrl(p.asin)} rel="sponsored noopener" target="_blank">
+									<span class="aaa-store-name">{p.name}</span>
+									<span class="aaa-store-cta">Buy on Amazon &rarr;</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+				<p class="aaa-store-disclosure">As an Amazon Associate, the AAA earns from qualifying purchases.</p>
+			</div>
+		</div>
+	</article>
+</Base>

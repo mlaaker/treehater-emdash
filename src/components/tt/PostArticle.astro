@@ -1,0 +1,133 @@
+---
+/**
+ * One post in Twenty Twenty's markup. Archives (home, category, tag, author,
+ * search) show the full post with a linked title; single posts add the tag
+ * list at the bottom.
+ */
+import { PortableText, Image } from "emdash/ui";
+import Icon from "./Icon.astro";
+import { commentLabel, permalink, wpDate, type PostEntry, type PostExtras } from "../../lib/tt";
+
+interface Props {
+	post: PostEntry;
+	extras: PostExtras;
+	single?: boolean;
+}
+
+const { post, extras, single = false } = Astro.props;
+const url = permalink(post.id);
+const title = post.data.title || "Untitled";
+const author = post.data.bylines?.[0]?.byline;
+const date = wpDate(post.data.publishedAt);
+const { categories, tags, commentCount } = extras;
+const commentsHref = commentCount > 0 ? `${url}#comments` : `${url}#respond`;
+---
+
+<article class:list={["post type-post status-publish hentry", !post.data.featured_image && "missing-post-thumbnail"]} id={`post-${post.data.id}`}>
+	<header class="entry-header has-text-align-center header-footer-group">
+		<div class="entry-header-inner section-inner medium">
+			{
+				categories.length > 0 && (
+					<div class="entry-categories">
+						<span class="screen-reader-text">Categories</span>
+						<div class="entry-categories-inner">
+							{categories.map((c) => (
+								<a href={`/category/${c.slug}/`} rel="category tag">
+									{c.label}
+								</a>
+							))}
+						</div>
+					</div>
+				)
+			}
+			{
+				single ? (
+					<h1 class="entry-title" {...post.edit.title}>{title}</h1>
+				) : (
+					<h2 class="entry-title heading-size-1">
+						<a href={url}>{title}</a>
+					</h2>
+				)
+			}
+			<div class="post-meta-wrapper post-meta-single post-meta-single-top">
+				<ul class="post-meta">
+					{
+						author && (
+							<li class="post-author meta-wrapper">
+								<span class="meta-icon">
+									<span class="screen-reader-text">Post author</span>
+									<Icon name="user" />
+								</span>
+								<span class="meta-text">
+									By <a href={`/author/${author.slug}/`}>{author.displayName}</a>
+								</span>
+							</li>
+						)
+					}
+					<li class="post-date meta-wrapper">
+						<span class="meta-icon">
+							<span class="screen-reader-text">Post date</span>
+							<Icon name="calendar" />
+						</span>
+						<span class="meta-text">
+							<a href={url}>{date}</a>
+						</span>
+					</li>
+					<li class="post-comment-link meta-wrapper">
+						<span class="meta-icon"><Icon name="comment" /></span>
+						<span class="meta-text">
+							<a href={commentsHref}>
+								{commentLabel(commentCount)}
+								<span class="screen-reader-text"> on {title}</span>
+							</a>
+						</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	{
+		post.data.featured_image && (
+			<figure class="featured-media">
+				<div class="featured-media-inner section-inner medium">
+					<Image image={post.data.featured_image} />
+				</div>
+			</figure>
+		)
+	}
+
+	<div class="post-inner thin">
+		<div class="entry-content" {...post.edit.content}>
+			<PortableText value={post.data.content ?? []} />
+		</div>
+	</div>
+
+	<div class="section-inner">
+		{
+			single && tags.length > 0 && (
+				<div class="post-meta-wrapper post-meta-single post-meta-single-bottom">
+					<ul class="post-meta">
+						<li class="post-tags meta-wrapper">
+							<span class="meta-icon">
+								<span class="screen-reader-text">Tags</span>
+								<Icon name="tag" />
+							</span>
+							<span class="meta-text">
+								{tags.map((t, i) => (
+									<>
+										{i > 0 && ", "}
+										<a href={`/tag/${t.slug}/`} rel="tag">
+											{t.label}
+										</a>
+									</>
+								))}
+							</span>
+						</li>
+					</ul>
+				</div>
+			)
+		}
+	</div>
+	<slot />
+</article>
