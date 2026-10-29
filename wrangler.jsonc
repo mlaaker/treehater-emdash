@@ -9,8 +9,10 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "treehater-emdash-db",
-			"database_id": "098cfed8-2910-4957-9a9c-23076a2e38d1",
+			// Fresh database for the exporter import (2026-10-29). The April trial
+			// import stays untouched in treehater-emdash-db (098cfed8-…) as a backup.
+			"database_name": "treehater-emdash-db-v2",
+			"database_id": "586f5ffa-d502-4203-8388-ff4c542853ca",
 		},
 	],
 	"r2_buckets": [
@@ -26,9 +28,8 @@
 			"id": "5fa5a3110e3d4c63905da44e5bf0fc2e",
 		},
 	],
-	// Custom domains (staging.treehater.com for the admin/import, then www and
-	// the apex at cutover) are attached in the dashboard, not here, so a deploy
-	// never moves DNS.
+	// Custom domains (the apex for the admin/import, then www at cutover) are
+	// attached in the dashboard, not here, so a deploy never moves DNS.
 	"workers_dev": true,
 	"observability": {
 		"enabled": true,
