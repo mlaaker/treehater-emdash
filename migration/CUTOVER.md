@@ -32,16 +32,28 @@ archive. Nothing below depends on it.
 4. **Import**: Admin → Import → upload the WXR → Review (post → posts, page →
    pages; map `notreesfebreeze` to your user, leave `silas` as a guest byline)
    → Import → Copy media. Media copies from `/wp-content/uploads/` on the
-   Worker itself.
+   Worker itself. **This fails with HTTP 522** (a Worker can't fetch its own
+   hostname); skip it. Posts use the uploads at their old paths and don't
+   need the media library.
 5. **Database fixes** (Claude runs these):
    ```
    npx wrangler d1 execute treehater-emdash-db-v2 --remote --file migration/rewrite-upload-urls.sql
    python3 -I migration/wxr-comments-to-sql.py ~/Downloads/anti-arborealassociation.WordPress.2026-10-29.xml > migration/comments.sql
    npx wrangler d1 execute treehater-emdash-db-v2 --remote --file migration/comments.sql
    ```
-6. **Embeds and other fixes**: `migration/post-import-fixes.md`.
+6. **Paragraphs, embeds, bylines**:
+   ```
+   python3 -I migration/split-paragraphs.py --remote > /tmp/split.sql
+   npx wrangler d1 execute treehater-emdash-db-v2 --remote --file /tmp/split.sql
+   python3 -I migration/restore-embeds.py --remote > /tmp/embeds.sql
+   npx wrangler d1 execute treehater-emdash-db-v2 --remote --file /tmp/embeds.sql
+   ```
+   then the rest of `migration/post-import-fixes.md`.
 7. **Verify**: every URL in `redirect-check.txt` against www returns 200/301,
    images load, comments show, drafts 404.
+
+Done 2026-10-29: domains attached 14:18:55; import, fixes and verification
+finished the same afternoon (84/84 URLs).
 
 ## Rollback
 

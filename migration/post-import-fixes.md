@@ -1,12 +1,27 @@
 # Post-import fixes
 
+Status 2026-10-29: all of these were applied to production after the import
+(see CUTOVER.md); the scripts are kept for a re-import.
+
+## Paragraphs
+
+Classic posts store paragraphs as blank lines, which the WXR import keeps as
+one block per post. `migration/split-paragraphs.py` splits them.
+
+## Authors
+
+The import screen mapped both WordPress authors to the admin user. The
+"Editor at large, Silas Turncoat" guest byline was re-created by hand and
+credited on /and-this-is-how-mankind-will-end/.
+
 Things the WordPress import drops or mangles on this site, found by importing
 the real WXR export into a local dev database on 2026-10-29. Check each one
 after the import (CUTOVER.md step 6).
 
 ## Embeds (raw `<iframe>`/`<embed>` HTML is dropped by the HTML → Portable Text conversion)
 
-Re-add each as an Embed/Iframe block at the same spot in the post.
+`migration/restore-embeds.py` re-adds each as an `iframe` block after the
+paragraph it followed on WordPress.
 
 | Post | Embed | Note |
 |---|---|---|
