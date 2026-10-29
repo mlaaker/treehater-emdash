@@ -19,6 +19,17 @@
 			"bucket_name": "treehater-emdash-media",
 		},
 	],
+	// Sessions namespace created by the first deploy on 2026-04-02; reuse it.
+	"kv_namespaces": [
+		{
+			"binding": "SESSION",
+			"id": "5fa5a3110e3d4c63905da44e5bf0fc2e",
+		},
+	],
+	// Custom domains (staging.treehater.com for the admin/import, then www and
+	// the apex at cutover) are attached in the dashboard, not here, so a deploy
+	// never moves DNS.
+	"workers_dev": true,
 	"observability": {
 		"enabled": true,
 	},
