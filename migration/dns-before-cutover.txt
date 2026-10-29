@@ -1,0 +1,7 @@
+treehater.com DNS before cutover (2026-10-29, from 1.1.1.1; zone c629712e5d1a781aae9af99eaa88c1bf)
+treehater.com      A  69.163.180.110  (DreamHost, DNS-only)
+www.treehater.com  A  69.163.180.110  (DreamHost, DNS-only)
+*.treehater.com    A  69.163.180.110  (wildcard; untouched)
+MX  0 aspmx.l.google.com; TXT spf/google-site-verification/brave (untouched)
+Rollback: remove both custom domains from the treehater-emdash Worker, then
+re-add the two A records above, DNS-only.

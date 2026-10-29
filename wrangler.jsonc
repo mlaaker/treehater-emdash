@@ -28,8 +28,11 @@
 			"id": "5fa5a3110e3d4c63905da44e5bf0fc2e",
 		},
 	],
-	// Custom domains (www and the apex, at cutover) are attached in the
-	// dashboard, not here, so a deploy never moves DNS.
+	// Cut over 2026-10-29. Rollback: migration/dns-before-cutover.txt.
+	"routes": [
+		{ "pattern": "www.treehater.com", "custom_domain": true },
+		{ "pattern": "treehater.com", "custom_domain": true },
+	],
 	"workers_dev": true,
 	"observability": {
 		"enabled": true,
