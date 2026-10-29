@@ -1,33 +1,31 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
+	// House of Laaker. Pinned so no deploy can land in the Civilian Power account.
+	"account_id": "8a497e94551222093a598d3fa0c30190",
 	"name": "treehater-emdash",
 	"main": "./src/worker.ts",
-	"compatibility_date": "2026-03-29",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"assets": {
-		"directory": "./dist",
-	},
+	"compatibility_date": "2026-02-24",
+	"compatibility_flags": ["nodejs_compat"],
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "treehater-emdash-db","database_id": "098cfed8-2910-4957-9a9c-23076a2e38d1",
-			// Run `wrangler d1 create my-emdash-site` and paste the ID here
+			"database_name": "treehater-emdash-db",
+			"database_id": "098cfed8-2910-4957-9a9c-23076a2e38d1",
 		},
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
-			"bucket_name": "treehater-emdash-media","preview_bucket_name": "treehater-emdash-media",
+			"bucket_name": "treehater-emdash-media",
 		},
 	],
 	"observability": {
 		"enabled": true,
 	},
-	"worker_loaders": [
-		{
-			"binding": "LOADER",
-		},
-	],
+	// Sandboxed plugins require Worker Loader, available on Workers paid plans.
+	"worker_loaders": [{ "binding": "LOADER" }],
+	// General maintenance cron trigger
+	"triggers": {
+		"crons": ["* * * * *"],
+	},
 }
