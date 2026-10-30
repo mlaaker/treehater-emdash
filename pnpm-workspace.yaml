@@ -13,3 +13,8 @@ minimumReleaseAgeExclude:
   - emdash
   - "@emdash-cms/*"
 blockExoticSubdeps: true
+
+# zod < 4.6.6 can exhaust memory on oversized input (Dependabot alert 7). EmDash and
+# its dependencies pin 4.5.x; drop this once they're past it.
+overrides:
+  zod: ^4.6.7
