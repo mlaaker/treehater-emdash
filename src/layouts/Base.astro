@@ -65,8 +65,8 @@ const { siteTitle, siteTagline, siteLogo } = resolveBlogSiteIdentity(settingsRes
 // /page/2/) "Site title – Tagline".
 const isFrontTitle = title === siteTitle || title.startsWith(`${siteTitle} – `);
 const fullTitle = isFrontTitle ? `${title} – ${siteTagline}` : `${title} – ${siteTitle}`;
-const logoUrl = siteLogo?.url ?? "/aaa-logo.png";
-const faviconUrl = settingsResult.data?.favicon?.url ?? "/favicon.png";
+const logoUrl = siteLogo?.url ?? "/_emdash/api/media/file/aaa-logo.png";
+const faviconUrl = settingsResult.data?.favicon?.url ?? "/_emdash/api/media/file/favicon.png";
 
 const menuItems = menuResult.data?.items ?? [];
 const footerWidgets = (footerResult.data?.widgets ?? []).filter(
